@@ -96,27 +96,27 @@ function prepareWatch(opt: any, files: string[]): gts.WatchOptions{
 
 
 function checkBasePath(opt: any): string{
-    
+
     if(util.isUndef(opt.basePath)){
         return;
     }
-    
+
     let result: string = "";
-    
+
     if(util.isStr(opt.basePath)){
         result = opt.basePath;
     }
     if(!result){
         return undefined;
     }
-    
+
     result = util.normalizePath(result);
     if(result.lastIndexOf("/") !== result.length - 1){
         result = result + "/";
     }
 
-    util.writeWarn("BasePath option has been deprecated. Method for determining an output directory has been changed in the same way as the TSC. " + 
-                   "Please re-set output directory with the new rootDir option or use keepDirectoryHierachy option. " + 
+    util.writeWarn("BasePath option has been deprecated. Method for determining an output directory has been changed in the same way as the TSC. " +
+                   "Please re-set output directory with the new rootDir option or use keepDirectoryHierachy option. " +
                    "However, keepDirectoryHierachy option would not be available long.")
     return result;
 }
@@ -145,6 +145,10 @@ function prepareModule(opt: any): ts.ModuleKind {
             result = ts.ModuleKind.CommonJS;
         } else if (temp === 'amd') {
             result = ts.ModuleKind.AMD;
+        } else if(temp === 'system'){
+            result = ts.ModuleKind.System;
+        } else if(temp === 'umd') {
+            result = ts.ModuleKind.UMD;
         }
     }
     return result;
@@ -173,7 +177,7 @@ function prepareGenerateTsConfig(opt: any): boolean | string{
 }
 
 export function createGruntOption(source: any, grunt: IGrunt, gruntFile: grunt.file.IFilesConfig, logger: gts.Logger): gts.CompilerOptions {
-   
+
     let dest = util.normalizePath(gruntFile.dest || ""),
         singleFile = !!dest && _path.extname(dest) === ".js",
         targetVersion = prepareTarget(source),
@@ -181,7 +185,7 @@ export function createGruntOption(source: any, grunt: IGrunt, gruntFile: grunt.f
         rootDir = util.isStr(source.rootDir) ? source.rootDir : undefined,
         keepDirectoryHierarchy = boolOrUndef(source, "keepDirectoryHierarchy");
 
-    function getTargetFiles(): string[]{        
+    function getTargetFiles(): string[]{
         return <string[]>grunt.file.expand(<string[]>gruntFile.orig.src);
     }
 
@@ -219,7 +223,7 @@ export function createGruntOption(source: any, grunt: IGrunt, gruntFile: grunt.f
         });
         return grunt.file.expand(target);
     }
-    
+
     if(keepDirectoryHierarchy){
         rootDir = undefined;
     }else{
@@ -243,7 +247,7 @@ export function createGruntOption(source: any, grunt: IGrunt, gruntFile: grunt.f
             sourceMap: boolOrUndef(source, "sourceMap"),
             declaration: boolOrUndef(source, "declaration"),
             out: singleFile ? dest : undefined,
-            outDir: singleFile ? undefined: 
+            outDir: singleFile ? undefined:
                     keepDirectoryHierarchy ? undefined: dest,
             noLib: boolOrUndef(source, "noLib"),
             noImplicitAny: boolOrUndef(source, "noImplicitAny"),
@@ -257,9 +261,9 @@ export function createGruntOption(source: any, grunt: IGrunt, gruntFile: grunt.f
             emitDecoratorMetadata: boolOrUndef(source, "emitDecoratorMetadata")
         }
     };
-    
+
     logger.verbose("--option");
     logger.verbose(JSON.stringify(result, null, "  "));
-    
+
     return result;
 }

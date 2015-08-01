@@ -128,6 +128,12 @@ function prepareModule(opt) {
         else if (temp === 'amd') {
             result = 2 /* AMD */;
         }
+        else if (temp === 'system') {
+            result = 3 /* System */;
+        }
+        else if (temp === 'umd') {
+            result = 4 /* UMD */;
+        }
     }
     return result;
 }
